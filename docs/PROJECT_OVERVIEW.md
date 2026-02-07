@@ -1,10 +1,10 @@
 # The Applied Behavioral Data Science Collective – Project 1 Overview  
-Human Cognitive Performance Analysis Project
+## Human Cognitive Performance Analysis Project
 
 ---
 
-## Dataset
-**Human Cognitive Performance Dataset** (80,000 participants)
+## Dataset  
+**Human Cognitive Performance Dataset (80,000 participants)**
 
 This dataset includes lifestyle variables such as:
 - sleep duration  
@@ -12,6 +12,7 @@ This dataset includes lifestyle variables such as:
 - screen time  
 - exercise time  
 - caffeine intake  
+- diet type  
 - age  
 - gender  
 
@@ -21,17 +22,30 @@ And cognitive outcomes such as:
 
 ---
 
-## Project Goal
+## Cleaned Dataset File (Use This Version)
+
+To keep everyone working from the same standardized dataset, we will all use the cleaned file stored in the GitHub repo:
+
+📍 `data/clean/human_cognitive_performance_clean.csv`
+
+This cleaned dataset includes an additional column:
+- `age_group` (18–29, 30–44, 45–59, 60+)
+
+This will be used for our age breakdown comparisons.
+
+---
+
+## Project Goal  
 Explore which daily lifestyle habits show the strongest relationships with cognitive performance.
 
 ---
 
-## Shared Research Question
+## Shared Research Question  
 **Which lifestyle habits show the strongest relationships with cognitive performance?**
 
 We are focusing specifically on relationships with:
-- **Cognitive_Score**
-- **Reaction_Time**
+- `cognitive_score`
+- `reaction_time`
 
 ---
 
@@ -45,65 +59,69 @@ We are focusing specifically on relationships with:
 ---
 
 ## Analysis Plan (Per Person)
+
 Each member will analyze their assigned lifestyle variable and compare it against both outcomes.
 
 ### Main Comparisons
-- variable vs **Cognitive_Score**
-- variable vs **Reaction_Time**
+- variable vs `cognitive_score`  
+- variable vs `reaction_time`
 
 ### Group Comparisons
-- breakdown by **Age Group**
-- breakdown by **Gender**
+- breakdown by age group  
+- breakdown by gender  
 
 ### Strength Metrics
 Each member will compute:
-- correlation with **Cognitive_Score**
-- correlation with **Reaction_Time**
+- correlation with `cognitive_score`
+- correlation with `reaction_time`
 
 ---
 
 ## EDA Plan (Per Person)
-Each member should complete:
 
-1. **Variable Check**
-   - range (min/max)
-   - missing values
-   - outliers or strange values
+Each member should complete the following:
 
-2. **Distribution**
-   - visualization of the variable’s distribution
-   - short written description of the pattern
+### 1. Variable Check
+- range (min/max)
+- missing values
+- outliers or strange values
 
-3. **Summary Statistics**
-   - mean, median, standard deviation, min, max
+### 2. Distribution
+- visualize the variable’s distribution  
+- short written description of the pattern
 
-4. **Cognitive Score Comparison**
-   - visualization of variable vs cognitive score
-   - brief interpretation of relationship strength/pattern
+### 3. Summary Statistics
+- mean, median, standard deviation, min, max
 
-5. **Reaction Time Comparison**
-   - visualization of variable vs reaction time
-   - brief interpretation of relationship strength/pattern
+### 4. Cognitive Score Comparison
+- visualize variable vs `cognitive_score`
+- brief interpretation of relationship strength/pattern
 
-6. **Age Group Breakdown**
-   - compare relationships across age bins
-   - example bins: 18–29, 30–44, 45–59, 60+
+### 5. Reaction Time Comparison
+- visualize variable vs `reaction_time`
+- brief interpretation of relationship strength/pattern
 
-7. **Gender Breakdown**
-   - compare relationships across male/female groups
+### 6. Age Group Breakdown
+- compare relationships across age bins  
+- bins: 18–29, 30–44, 45–59, 60+
 
-8. **Strength Metrics**
-   - correlation with cognitive score
-   - correlation with reaction time
+### 7. Gender Breakdown
+- compare relationships across gender groups  
+- note whether patterns differ across gender categories
 
-9. **Interpretation Notes**
-   - 3 key observations
-   - 1 surprising trend/threshold
-   - 1 discussion question for the group
+### 8. Strength Metrics
+- correlation with `cognitive_score`
+- correlation with `reaction_time`
+
+### 9. Interpretation Notes
+- 3 key observations
+- 1 surprising trend/threshold
+- 1 discussion question for the group
 
 ---
 
 ## Expected Outputs (Per Person)
+
 Each member will share:
 - key visuals (charts/plots)
 - correlation values (cognitive score + reaction time)
@@ -113,7 +131,9 @@ Each member will share:
 ---
 
 ## Collaboration Notes
-Members may use any tool (Python, R, Excel, SPSS, Tableau, etc.).  
+
+Members may use any tool (Python, R, Excel, SPSS, Tableau, etc.).
+
 The main goal is consistency in outputs so results can be compared and combined.
 
 We are observing relationships, not proving causation.  
@@ -169,10 +189,10 @@ Goal of this meeting:
 ---
 
 ## Repository Organization
-- `data/` → dataset files (raw + cleaned versions)
-- `notebooks/` → each member’s analysis file (any format is fine)
-- `outputs/` → exported charts, tables, and final report drafts
-- `docs/` → project overview + meeting notes
+- `data/` → dataset files (raw + cleaned versions)  
+- `notebooks/` → each member’s analysis file (any format is fine)  
+- `outputs/` → exported charts, tables, and final report drafts  
+- `docs/` → project overview + meeting notes  
 
 ---
 
@@ -186,7 +206,7 @@ Use a clear naming format such as:
 - `maitreya_stress_level`
 - `sarah_sleep_duration`
 
-(extensions may vary depending on tool: .ipynb, .Rmd, .xlsx, etc.)
+(extensions may vary depending on tool: `.ipynb`, `.Rmd`, `.xlsx`, etc.)
 
 ### Figures
 Use a consistent naming style such as:
@@ -199,9 +219,10 @@ Use a consistent naming style such as:
 ---
 
 ## Final Deliverables (Group Output)
+
 Our final group project will include:
-- a shared insight report combining all findings
-- a set of clean visualizations
+- a shared insight report combining all findings  
+- a set of clean visualizations  
 - an optional interactive "Try Your Habits" predictor tool (Streamlit)
 
 All deliverables are group-owned, and all contributors will be credited.
