@@ -1,0 +1,133 @@
+
+---
+title: "Regression Model"
+author: byron
+format:
+  pdf:
+    pdf-engine: xelatex
+    fig-pos: "!htbp"
+    tbl-pos: "!htbp"
+    number-depth: 3
+    include-in-header:
+      text: |
+        \renewcommand{\baselinestretch}{1.0}
+        \usepackage{graphicx}
+        \usepackage{xcolor}
+        \usepackage{amsmath,amssymb}
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \raggedbottom 
+        \usepackage{array}
+        \usepackage{multirow}
+        \usepackage{makecell}
+        \usepackage{pdflscape}
+        \usepackage{float}
+        \usepackage{fancyhdr}
+        \normalfont
+  gfm: default
+  html:
+    code-fold: true
+    html-math-method: katex
+fontsize: 7pt
+---
+
+```{r}
+
+rm(list = ls()) #setup
+
+# Loading packages
+
+library(tidyverse)
+library(performance) #model diagnostics
+
+# Loading Data
+
+human_cognitive_performance <- read.csv("D:/Behavioral Data Analysis/human_cognitive_performance_clean.csv", 
+                                        stringsAsFactors = F)
+
+```
+
+
+```{r}
+
+#Data isnpection
+
+str(human_cognitive_performance)
+summary(human_cognitive_performance)
+names(human_cognitive_performance)
+
+#checking for missing variables
+
+human_cognitive_performance %>% 
+  summarise(across(everything(), ~ sum(is.na(.))))       
+
+```
+
+
+# Variables of interest are age, gender, sleep duration, stress level, diet type, daily screen time, exercise frequency and caffeine intake. 
+
+```{r}
+
+#Setting up a new data frame with variables of interest
+
+human_cognitive_performance1 <- human_cognitive_performance %>% 
+  select(age, gender, sleep_duration, stress_level, diet_type, 
+         daily_screen_time, exercise_frequency, 
+         caffeine_intake, cognitive_score)
+
+str(human_cognitive_performance1)
+
+```
+
+#From the data structure;Some of the variables are characters and would need to be recoded
+
+```{r}
+#Recoding <chr> variables to factors
+
+library(dplyr)
+
+human_cognitive_performance1 <- human_cognitive_performance1 %>% 
+  dplyr::mutate(
+    gender = dplyr::recode(gender,
+                    "0" = "Male",
+                    "1" = "Female")
+  )
+
+human_cognitive_performance1 <- human_cognitive_performance1 %>% 
+  dplyr::mutate(
+    exercise_frequency = dplyr::recode(exercise_frequency,
+                    "1" = "Low",
+                    "2" = "Medium",
+                    "3" = "High")
+  )
+
+human_cognitive_performance1 <- human_cognitive_performance1 %>% 
+  dplyr::mutate(
+    diet_type = dplyr::recode(diet_type,
+                    "0" = "Non-Vegetarian",
+                    "1" = "Vegetarian",
+                    "2" = "Vegan")
+  )
+
+str(human_cognitive_performance1)
+
+
+```
+
+# Multiple Regression Model
+
+```{r}
+
+mr_model <- lm(cognitive_score ~ age +
+                 gender +
+                 sleep_duration +
+                 stress_level +
+                 diet_type +
+                 daily_screen_time +
+                 exercise_frequency +
+                 caffeine_intake,
+               data = human_cognitive_performance1)
+
+summary(mr_model)
+
+```
