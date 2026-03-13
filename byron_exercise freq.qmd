@@ -1,0 +1,250 @@
+
+---
+title: "Exercise frequency vs Cognitive Score and Reaction Time"
+author: byron
+format:
+  pdf:
+    pdf-engine: xelatex
+    fig-pos: "!htbp"
+    tbl-pos: "!htbp"
+    number-depth: 3
+    include-in-header:
+      text: |
+        \renewcommand{\baselinestretch}{1.0}
+        \usepackage{graphicx}
+        \usepackage{xcolor}
+        \usepackage{amsmath,amssymb}
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \raggedbottom 
+        \usepackage{array}
+        \usepackage{multirow}
+        \usepackage{makecell}
+        \usepackage{pdflscape}
+        \usepackage{float}
+        \usepackage{fancyhdr}
+        \normalfont
+  gfm: default
+  html:
+    code-fold: true
+    html-math-method: katex
+fontsize: 7pt
+---
+
+
+```{r}
+
+## Loading Packages
+
+library(tidyverse)
+library(psych)
+library(dplyr)
+library(readxl)
+```
+
+```{r}
+## Data Import
+
+human_cognitive_performance <- read.csv("D:/Behavioral Data Analysis/human_cognitive_performance_clean.csv")
+```
+
+```{r}
+## Data inspection
+
+# 1. Checking for missing values
+
+human_cognitive_performance %>%
+  summarise(across(everything(), ~ sum(is.na(.))))
+
+
+str(human_cognitive_performance)
+
+## Recoding exercise_freq from chr to int ( low = 1, medium = 2, high = 3)
+
+human_cognitive_performance$exercise_frequency <- recode(human_cognitive_performance$exercise_frequency,
+                                                         "Low" = 1,
+                                                         "Medium" = 2,
+                                                         "High" = 3)
+## Variable check 
+
+summary(human_cognitive_performance$exercise_frequency)
+
+sum(is.na(human_cognitive_performance$exercise_frequency))
+
+table(human_cognitive_performance$exercise_frequency)
+
+##checking for range
+
+range(human_cognitive_performance$exercise_frequency, na.rm = TRUE)
+```
+
+```{r}
+## Distribution
+
+ggplot(human_cognitive_performance, aes(x= exercise_frequency)) +
+  geom_bar(fill = "steelblue") +
+  facet_wrap(~ age_group) +
+  labs(title = "Distribution of Exercise Freq. in different age groups", 
+       x= "Exercise Freq." , 
+       y= "Count") +
+  theme_minimal()
+
+ggplot(human_cognitive_performance, aes(x= age_group)) +
+  geom_bar(fill = "navyblue") +
+  labs(title = "Distribution by Age Group", 
+       x= "Age Group" , 
+       y= "Count") +
+  theme_minimal()
+
+prop.table(table(human_cognitive_performance$age_group))
+```
+
+# Across all three age groups (18–29, 30–44, 45–59), most participants report Low (1) or Medium (2) exercise levels. High exercise (3) is less common. The pattern looks fairly similar across age groups, meaning exercise habits do not drastically differ by age in this sample.
+
+
+```{r}
+## Summary stats
+
+describe(human_cognitive_performance$exercise_frequency)
+
+```
+# On average, participants fall between Low and Medium exercise levels. The slight positive skew (0.34) suggests slightly more people report lower exercise levels.
+```{r}
+## Exercise and Cognitive score
+
+ggplot(human_cognitive_performance, aes(x= exercise_frequency,
+                                        y= cognitive_score)) +
+  geom_boxplot(fill = "skyblue") +
+  labs(title = "Exercise vs Cognitive score", 
+       x = "Exercise Freq.",
+       y = "Cognitive Score") +
+  theme_minimal()
+
+# exercise vs cognitive score in different age groups
+
+ggplot(human_cognitive_performance, aes(x= exercise_frequency,
+                                        y= cognitive_score)) +
+  geom_boxplot(fill = "skyblue") +
+  facet_wrap(~ age_group) +
+  labs(title = "Exercise vs Cognitive score", 
+       x = "Exercise Freq.",
+       y = "Cognitive Score") +
+  theme_minimal()
+
+```
+
+# Cognitive scores increase as exercise frequency increases.
+Participants with High exercise (3) tend to have higher median cognitive scores than those with Low exercise. This suggests a positive relationship between exercise and cognitive performance.
+
+
+```{r}
+## what's the correlation between exercise and cognitive score 
+
+cor_cog <- cor.test(human_cognitive_performance$exercise_frequency,
+                    human_cognitive_performance$cognitive_score, 
+                    method = "spearman",
+                    exact = F)
+
+cor_cog
+
+```
+# There is a small but statistically significant positive correlation between exercise frequency and cognitive score.
+
+```{r}
+## Exercise and Reaction time
+
+ggplot(human_cognitive_performance, aes(x= exercise_frequency,
+                                        y= reaction_time)) +
+  geom_boxplot(fill = "skyblue") +
+  labs(title = "Exercise vs Reaction time", 
+       x = "Exercise Freq.",
+       y = "Reaction time") +
+  theme_minimal()
+
+# exercise vs reaction time in different age groups
+
+ggplot(human_cognitive_performance, aes(x= exercise_frequency,
+                                        y= reaction_time)) +
+  geom_boxplot(fill = "skyblue") +
+  facet_wrap(~ age_group) +
+  labs(title = "Exercise vs Reaction time", 
+       x = "Exercise Freq.",
+       y = "Reaction time") +
+  theme_minimal()
+```
+
+# The boxplots look very similar across exercise levels. There is no clear visible trend. Reaction time does not meaningfully change with exercise frequency.Within each age group, there is still no noticeable pattern. Exercise does not appear related to reaction time.
+
+```{r}
+## what's the correlation between exercise and reaction time 
+
+cor_rt <- cor.test(human_cognitive_performance$exercise_frequency,
+                    human_cognitive_performance$reaction_time, 
+                    method = "spearman",
+                   exact = F)
+
+cor_rt
+
+human_cognitive_performance %>%
+  group_by(age_group) %>%
+  summarise(cor_rt =
+              cor(exercise_frequency,
+                  reaction_time,
+                  method="spearman",
+                  use="complete.obs"))
+```
+
+# There is no significant relationship between exercise frequency and reaction time.
+
+``` {r}
+## Does age and exercise frequency influence cognitive score? 
+
+cog_lm <- lm(formula = cognitive_score ~ age + exercise_frequency, data = human_cognitive_performance)
+
+summary(cog_lm)
+
+
+```
+
+# From this linear regression model, age was not a significant predictor;β0 = -0.007, p = .292 while exercise frequency was a significant predictor; β1 = 7.447, p < .001. Exercise frequency explained approximately 5.9% of the variance in cognitive performance.
+
+```{r}
+## gender grouping
+
+ggplot(human_cognitive_performance, aes(x= exercise_frequency,
+                                        y= cognitive_score)) +
+         geom_boxplot(fill = "yellow") +
+         facet_wrap(~ gender) +
+         theme_minimal()
+
+
+human_cognitive_performance %>%
+  group_by(gender) %>%
+  summarise(cor_cognitive =
+              cor(exercise_frequency,
+                  cognitive_score,
+                  method="spearman",
+                  use="complete.obs"))
+
+
+results <- tibble(
+  Outcome = c("Cognitive Score", "Reaction Time"),
+  Spearman_rho = c(
+    cor(human_cognitive_performance$exercise_frequency, human_cognitive_performance$cognitive_score,
+        method="spearman", use="complete.obs"),
+    cor(human_cognitive_performance$exercise_frequency, human_cognitive_performance$reaction_time,
+        method="spearman", use="complete.obs")
+  )
+)
+
+results
+
+summary(results)
+
+describe(results)
+
+```
+
+# The strength of the relationship is nearly identical across genders. Exercise is positively related to cognition regardless of gender.
+
+
