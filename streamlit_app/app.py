@@ -22,24 +22,33 @@ but it might be a good place to put a link to the repo.]
 ''')
 
 # page content
-st.title("""
-This is a title
+# page content
+st.title("Human Cognitive Performance Predictor")
+
+st.markdown("""
+Welcome to the **Human Cognitive Performance Predictor**.
+
+This app was created to explore how lifestyle and personal factors may relate to cognitive performance.  
+Using a trained machine learning model, users can input their own values and receive a predicted cognitive score based on patterns learned from the dataset.
+
+### Included factors
+- Age
+- Gender
+- Sleep Duration
+- Daily Screen Time
+- Caffeine Intake
+- Stress Level
+- Diet Type
+- Exercise Frequency
+
+### Purpose of the project
+The goal of this project is to demonstrate how behavioral and lifestyle variables can be used in a predictive analytics workflow.  
+It also provides an interactive way to engage with the model through a simple Streamlit application.
+
+### Getting started
+To begin, open the **Try It** page from the sidebar and enter your information.
 """)
 
-st.subheader("""
-This is a subheader
-""")
-
-st.write("""
-    We can write something about:
-         
-     * Our goal with this project
-     * The dataset, the variables we chose to analyse, caveats
-     * Short summary of our results
-
-    And maybe display the results on different pages.
-    """
-)
 
 # load model
 with open('maitreya_cognitive_score_model.pkl', 'rb') as f:

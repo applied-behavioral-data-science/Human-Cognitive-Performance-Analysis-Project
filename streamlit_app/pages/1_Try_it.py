@@ -1,12 +1,21 @@
 import streamlit as st
 import pandas as pd
+import os
+from datetime import datetime
+import pickle
 
+# load model once
+if "model" not in st.session_state:
+    with open("maitreya_cognitive_score_model.pkl", "rb") as f:
+        st.session_state.model = pickle.load(f)
+        
 # this is another page. it will show up in the left navigation bar
 
 st.title('Calculate your score!')
 
-# user input
-
+# "Name"
+st.subheader("Name")
+name = st.text_input("Enter your name")
 # Age
 st.subheader('Age')
 age = st.slider("How old are you?", 18, 100, 30)
@@ -20,7 +29,7 @@ gender = st.selectbox(
 
 # Sleep scales: 0-15 hours
 st.subheader('Sleep')
-sleep = 5 # replace with slider
+sleep = st.slider("How many hours of sleep do you get per night?", 0,15,7)
 
 # Screen time: 0-15 hours
 st.subheader('Daily screen time')
@@ -60,6 +69,60 @@ input_data = pd.DataFrame({
 })
 
 # predict
-if st.button("Predict Cognitive Score"):
+# -----------------------------
+# SAVE FUNCTION 
+# -----------------------------
+def save_to_csv(data_dict, filename="responses.csv"):
+    row_df = pd.DataFrame([data_dict])
+
+    if os.path.exists(filename):
+        row_df.to_csv(filename, mode="a", header=False, index=False)
+    else:
+        row_df.to_csv(filename, mode="w", header=True, index=False)
+
+# -----------------------------
+# BUTTON + PREDICTION
+# -----------------------------
+if st.button("Predict Cognitive Score", key="predict_score_button"):
+
+    # optional: require name
+    if not name.strip():
+        st.warning("Please enter your name first.")
+        st.stop()
+
     prediction = st.session_state.model.predict(input_data)
-    st.success(f"Predicted cognitive score: {prediction[0]:.2f}")
+    score = float(prediction[0])
+
+    # show result
+    st.success(f"{name}, your predicted cognitive score is: {score:.2f}")
+
+    # progress bar (0–100 scale)
+    score_for_bar = max(0, min(int(score), 100))
+    st.progress(score_for_bar)
+
+    # indicator
+    if score < 40:
+        st.error("Indicator: Lower predicted cognitive score")
+    elif score < 70:
+        st.warning("Indicator: Moderate predicted cognitive score")
+    else:
+        st.success("Indicator: Higher predicted cognitive score")
+
+    # save data
+    result_data = {
+        "Name": name,
+        "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Age": age,
+        "Gender": gender,
+        "Sleep_Duration": sleep,
+        "Daily_Screen_Time": screen,
+        "Caffeine_Intake": caffeine,
+        "Stress_Level": stress,
+        "Diet_Type": diet,
+        "Exercise_Frequency": exercise,
+        "Prediction": round(score, 2)
+    }
+
+    save_to_csv(result_data)
+
+    st.info("Your response was saved to responses.csv")

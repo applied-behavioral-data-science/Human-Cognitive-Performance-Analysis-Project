@@ -1,0 +1,3 @@
+Timestamp,Age,Gender,Sleep_Duration,Daily_Screen_Time,Caffeine_Intake,Stress_Level,Diet_Type,Exercise_Frequency,Prediction
+2026-04-04 10:15:32,45,Female,7,4,100,4,Non-Vegetarian,Low,109.27
+Sarah,2026-04-04 10:26:06,25,Female,6,7,100,6,Non-Vegetarian,Medium,106.73
