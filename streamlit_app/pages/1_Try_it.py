@@ -3,10 +3,8 @@ import pandas as pd
 import os
 from datetime import datetime
 import pickle
-
-# load model once
-
-import os
+import gspread
+from google.oauth2.service_account import Credentials
 
 # load model once
 if "model" not in st.session_state:
@@ -81,15 +79,28 @@ input_data = pd.DataFrame({
 
 # predict
 # -----------------------------
-# SAVE FUNCTION 
+# SAVE FUNCTION
 # -----------------------------
-def save_to_csv(data_dict, filename="responses.csv"):
-    row_df = pd.DataFrame([data_dict])
+@st.cache_resource
+def get_gsheet_worksheet():
+    scopes = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"], scopes=scopes
+    )
+    client = gspread.authorize(creds)
+    return client.open_by_url(st.secrets["sheet_url"]).sheet1
 
-    if os.path.exists(filename):
-        row_df.to_csv(filename, mode="a", header=False, index=False)
-    else:
-        row_df.to_csv(filename, mode="w", header=True, index=False)
+def save_to_gsheet(data_dict):
+    worksheet = get_gsheet_worksheet()
+    column_order = [
+        "Name", "Timestamp", "Age", "Gender", "Sleep_Duration",
+        "Daily_Screen_Time", "Caffeine_Intake", "Stress_Level",
+        "Diet_Type", "Exercise_Frequency", "Prediction",
+    ]
+    worksheet.append_row([data_dict[col] for col in column_order])
 
 # -----------------------------
 # BUTTON + PREDICTION
@@ -134,6 +145,8 @@ if st.button("Predict Cognitive Score", key="predict_score_button"):
         "Prediction": round(score, 2)
     }
 
-    save_to_csv(result_data)
-
-    st.info("Your response was saved to responses.csv")
+    try:
+        save_to_gsheet(result_data)
+        st.info("Your response was saved to the Google Sheet.")
+    except Exception as e:
+        st.error(f"Could not save to Google Sheet: {e}")
