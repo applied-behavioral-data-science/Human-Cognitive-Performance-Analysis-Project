@@ -5,9 +5,15 @@ from datetime import datetime
 import pickle
 
 # load model once
+
+import os
+
+# load model once
 if "model" not in st.session_state:
-    with open("maitreya_cognitive_score_model.pkl", "rb") as f:
+    model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "maitreya_cognitive_score_model.pkl")
+    with open(model_path, "rb") as f:
         st.session_state.model = pickle.load(f)
+
         
 # this is another page. it will show up in the left navigation bar
 
@@ -37,7 +43,12 @@ screen = st.slider("What''s your daily screen time?", 0,12,4)
 
 # Caffeine intake: 0-400 mg
 st.subheader('Caffeine intake')
-caffeine = 100 # replace this line with a slider
+user_caffeine = st.slider("How much caffeine do you consume per day? (mg)",
+    min_value=0,
+    max_value=600,
+    value=100,
+    step=10,
+    help="A typical coffee has ~95mg of caffeine.")
 
 # Stress Level: 1-10 (1 no/low stress, 10 extreme stress)
 st.subheader('Stress level')
@@ -61,7 +72,7 @@ input_data = pd.DataFrame({
     "Exercise_Frequency": [exercise],
     "Gender": [gender],
     "Diet_Type": [diet],
-    "Caffeine_Intake": [caffeine],
+    "Caffeine_Intake": [user_caffeine],
     "Daily_Screen_Time": [screen],
     "Stress_Level": [stress],
     "Memory_Test_Score": [memory],
@@ -116,7 +127,7 @@ if st.button("Predict Cognitive Score", key="predict_score_button"):
         "Gender": gender,
         "Sleep_Duration": sleep,
         "Daily_Screen_Time": screen,
-        "Caffeine_Intake": caffeine,
+        "Caffeine_Intake": user_caffeine,
         "Stress_Level": stress,
         "Diet_Type": diet,
         "Exercise_Frequency": exercise,

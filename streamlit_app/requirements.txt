@@ -1,2 +1,3 @@
 streamlit==1.48
 scikit-learn==1.5.1
+pandas==2.2.3
