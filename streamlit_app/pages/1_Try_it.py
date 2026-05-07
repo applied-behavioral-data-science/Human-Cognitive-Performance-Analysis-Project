@@ -93,14 +93,33 @@ def get_gsheet_worksheet():
     client = gspread.authorize(creds)
     return client.open_by_url(st.secrets["sheet_url"]).sheet1
 
+COLUMN_ORDER = [
+    "Name", "Timestamp", "Age", "Gender", "Sleep_Duration",
+    "Daily_Screen_Time", "Caffeine_Intake", "Stress_Level",
+    "Diet_Type", "Exercise_Frequency", "Prediction",
+]
+
 def save_to_gsheet(data_dict):
     worksheet = get_gsheet_worksheet()
-    column_order = [
-        "Name", "Timestamp", "Age", "Gender", "Sleep_Duration",
-        "Daily_Screen_Time", "Caffeine_Intake", "Stress_Level",
-        "Diet_Type", "Exercise_Frequency", "Prediction",
-    ]
-    worksheet.append_row([data_dict[col] for col in column_order])
+    worksheet.append_row([data_dict[col] for col in COLUMN_ORDER])
+
+def save_to_csv(data_dict, filename="responses.csv"):
+    row_df = pd.DataFrame([{col: data_dict[col] for col in COLUMN_ORDER}])
+    write_header = not os.path.exists(filename)
+    row_df.to_csv(filename, mode="a", header=write_header, index=False)
+
+def gsheet_configured():
+    try:
+        return "gcp_service_account" in st.secrets and "sheet_url" in st.secrets
+    except Exception:
+        return False
+
+def save_response(data_dict):
+    if gsheet_configured():
+        save_to_gsheet(data_dict)
+        return "the Google Sheet"
+    save_to_csv(data_dict)
+    return "responses.csv"
 
 # -----------------------------
 # BUTTON + PREDICTION
@@ -146,7 +165,7 @@ if st.button("Predict Cognitive Score", key="predict_score_button"):
     }
 
     try:
-        save_to_gsheet(result_data)
-        st.info("Your response was saved to the Google Sheet.")
+        destination = save_response(result_data)
+        st.info(f"Your response was saved to {destination}.")
     except Exception as e:
-        st.error(f"Could not save to Google Sheet: {e}")
+        st.error(f"Could not save your response: {e}")
